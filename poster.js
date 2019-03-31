@@ -20,8 +20,8 @@ module.exports.getToken = (code) => {
         redirect_uri: process.env.POSTER_REDIRECT_URI,
         grant_type: 'authorization_code',
       }}, (err, resp, body) => {
-      if (err || resp.statusCode !== 200) {
-        reject(err);
+      if (err || resp.statusCode !== 200 || (JSON.parse(body).code && JSON.parse(body).code !== 200)) {
+        return reject(err || 'Error with response: ' + body);
       }
 
       const {access_token} = JSON.parse(body);
@@ -38,6 +38,10 @@ module.exports.getToken = (code) => {
 };
 
 module.exports.getClients = (accessToken) => {
+  if (!accessToken) {
+    throw new Error('Access token not provided');
+  }
+
   return new Promise((resolve, reject) => {
     request(`https://joinposter.com/api/clients.getClients?token=${accessToken}`, (err, resp, body) => {
       if (err) reject(err);
@@ -45,6 +49,7 @@ module.exports.getClients = (accessToken) => {
       const parsedBody = JSON.parse(body);
       const clients = parsedBody.response;
       if (!clients) return;
+      console.time('Clients got in');
 
       const clientsData = clients.map((client) => {
         const {
@@ -68,6 +73,8 @@ module.exports.getClients = (accessToken) => {
         }
       });
 
+      console.timeEnd('Clients got in');
+      console.log(`Total clients: ${clientsData.length}`);
       resolve(clientsData);
     })
   });
