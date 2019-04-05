@@ -1,14 +1,14 @@
 const express = require('express');
-const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser');
 const poster = require('./poster');
 const amo = require('./amo');
 const cron = require('./cron');
 
 const app = express();
 
-app.use(cookieParser());
-
 let tk = '';
+
+app.use(bodyParser.json());
 
 function beautifyAccessToken(tk) {
   if (!tk) {
@@ -44,40 +44,36 @@ app.get('/auth-poster', async (req, res) => {
     return res.send(err);
   }
 
-  try {
-    cron.startCron(tk);
-  } catch (err) {
-    console.error("Something wrong with cron:");
-    console.error(err);
-    return res.send(err);
-  }
-
   console.log(`Access token: ${beautifyAccessToken(tk)}`);
   console.log(`To authenticate amo go to:\n${amo.amoAuthUri}\n`);
 
   res.send(`Access token: ${beautifyAccessToken(tk)}
     <br/>
-    Authenticate amocrm by go to: <a href="http://127.0.0.1/auth-amo"> this link </a>
+    Authenticate amocrm by go to: <a href="http://${process.env.SERVER_URI}/auth-amo"> this link </a>
   `);
-
-  // const clients = await poster.getClients(accessToken).catch((err) => res.send(err));
-  // console.log(clients);
 });
 
 app.get('/auth-amo', async (req, res) => {
   await amo.auth().catch((err) => res.send(err));
 
   console.log(`Amo authenticated successful`);
-  console.log(`Getting clients...`);
 
-  amo.updateUsers(tk);
+  // amo.updateUsers(tk);
+  // amo.congratulate().catch((err) => console.error(err));
 
   res.send('Authenticated!');
+
+  cron.startCron(tk);
+});
+
+app.post('/client-payed', (req, res) => {
+  console.log(req.body);
+  res.send(200, '')
 });
 
 app.listen(80, () => {
-  console.log('Listen on localhost:80\n');
+  console.log(`Listen on ${process.env.SERVER_URI}:80\n`);
   const posterCodeUri = poster.buildGetTokenUri();
-  console.log(`To start go to:\nhttp://127.0.0.1/\n`);
+  console.log(`To start go to:\nhttp://${process.env.SERVER_URI}/\n`);
 });
 

@@ -44,7 +44,9 @@ module.exports.getClients = (accessToken) => {
 
   return new Promise((resolve, reject) => {
     request(`https://joinposter.com/api/clients.getClients?token=${accessToken}`, (err, resp, body) => {
-      if (err) reject(err);
+      if (err) {
+        return reject(err);
+      }
 
       const parsedBody = JSON.parse(body);
       const clients = parsedBody.response;
@@ -57,9 +59,10 @@ module.exports.getClients = (accessToken) => {
           firstname,
           lastname,
           card_number,
-          phone_number,
+          phone,
           email,
-          comment
+          comment,
+          birthday
         } = client;
 
         return {
@@ -67,9 +70,10 @@ module.exports.getClients = (accessToken) => {
           firstname,
           lastname,
           card_number,
-          phone_number,
+          phone,
           email,
-          comment
+          comment,
+          birthday
         }
       });
 
