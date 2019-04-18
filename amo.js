@@ -9,7 +9,7 @@ const request = r.defaults({jar:j});
 
 const AUTH_URI = `https://${process.env.AMO_SUBDOMAIN}.amocrm.ru/private/api/auth.php?type=json`;
 const AMO_API_CONTACTS = `https://${process.env.AMO_SUBDOMAIN}.amocrm.ru/api/v2/contacts`;
-const AMO_BIRTHDAY_URI = `https://${process.env.AMO_SUBDOMAIN}.amocrm.ru/api/v2/leads`;
+const AMO_LEADS_URI = `https://${process.env.AMO_SUBDOMAIN}.amocrm.ru/api/v2/leads`;
 const DEFAULT_CLIENTS_RANGE = 250;
 
 let totalClients = 0;
@@ -36,6 +36,75 @@ async function req(url) {
       resolve(b._embedded.items);
     })
   });
+}
+
+async function getContacts() {
+  const contacts = [];
+
+  for (let i = 0;;i += 500) {
+    const r = await req(`${AMO_API_CONTACTS}?limit_rows=500&limit_offset=${i}`);
+
+    if (!r.length) {
+      break;
+    }
+
+    contacts.push(...r);
+  }
+
+  return contacts;
+}
+
+async function saveUsers(formData) {
+  return new Promise((resolve, reject) => {
+    request({
+      uri: AMO_API_CONTACTS,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST',
+      body: JSON.stringify(formData),
+    }, (err, resp, body) => {
+      if (err) {
+        return reject(err);
+      }
+
+      if (resp.statusCode === 504) {
+        saveUsers(formData);
+      }
+
+      const response = JSON.parse(body).response;
+      if (response) {
+        return reject(`Error with uploading: ${response.error}`);
+      }
+
+      totalClients += formData.add.length;
+
+      console.log(`${totalClients} clients uploaded`);
+      resolve();
+    });
+  })
+}
+
+async function getUserIdByQuery(id = 0) {
+  if (!id) {
+    return 0;
+  }
+
+  const res = await req(`${AMO_API_CONTACTS}?query=${id}`);
+
+  for (let i = 0; i < res.length; i++) {
+    const user = res[i];
+
+    for (let k = 0; k < user.custom_fields.length; k++) {
+      const el = user.custom_fields[k];
+
+      if (el.id === enums.POSTER_ID && el.values[0].value === id.toString()) {
+        return user.id;
+      }
+    }
+  }
+
+  return 0;
 }
 
 function validURL(str) {
@@ -149,53 +218,6 @@ function getUserData(formData, clients) {
 	}
 }
 
-async function getContacts() {
-  const contacts = [];
-
-  for (let i = 0;;i += 500) {
-    const r = await req(`${AMO_API_CONTACTS}?limit_rows=500&limit_offset=${i}`);
-
-    if (!r.length) {
-      break;
-    }
-
-    contacts.push(...r);
-  }
-
-  return contacts;
-}
-
-async function saveUsers(formData) {
-  return new Promise((resolve, reject) => {
-    request({
-      uri: AMO_API_CONTACTS,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'POST',
-      body: JSON.stringify(formData),
-    }, (err, resp, body) => {
-      if (err) {
-        return reject(err);
-      }
-
-      if (resp.statusCode === 504) {
-        saveUsers(formData);
-      }
-
-      const response = JSON.parse(body).response;
-      if (response) {
-        return reject(`Error with uploading: ${response.error}`);
-      }
-
-      totalClients += formData.add.length;
-
-      console.log(`${totalClients} clients uploaded`);
-      resolve();
-    });
-  })
-}
-
 function isBirthday(user) {
   if (!user || !user.custom_fields) {
     return false;
@@ -233,14 +255,15 @@ function sendCongrats(id) {
         sale: 1,
         contacts_id: [
           id
-        ]
+        ],
+        pipeline_id: 1753246
       }
     ]
   };
 
   return new Promise((resolve, reject) => {
     request({
-      uri: AMO_BIRTHDAY_URI,
+      uri: AMO_LEADS_URI,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -250,7 +273,7 @@ function sendCongrats(id) {
       if (err) {
         return reject(err);
       }
-//43200000
+
       console.log(`User with id ${id} congratulated!`);
       resolve();
     });
@@ -332,6 +355,50 @@ module.exports.congratulate = async () => {
     await sendCongrats(birthdaysList[i].id);
   }
 };
+
+module.exports.recordPurchase = async (purchaseData = {}) => {
+  if (!purchaseData.objectId || !purchaseData.time || !purchaseData.amount) {
+    return;
+  }
+
+  const amoUserId = await getUserIdByQuery(purchaseData.objectId);
+
+  if (!amoUserId) {
+    return;
+  }
+
+  const postData = {
+    add: [
+      {
+        name: "Покупка",
+        sale: purchaseData.amount,
+        created_at: purchaseData.time,
+        contacts_id: [
+          amoUserId
+        ],
+        pipeline_id: 1753246
+      }
+    ]
+  };
+
+  return new Promise((resolve, reject) => {
+    request({
+      uri: AMO_LEADS_URI,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST',
+      body: JSON.stringify(postData),
+    }, (err, resp, body) => {
+      if (err) {
+        return reject(err);
+      }
+
+      console.log(`User with id ${amoUserId} make purchase with ${purchaseData.amount} amount!`);
+      resolve();
+    });
+  });
+} 
 
 // FIXME: using only for debugging. Remove on production
 process.on('unhandledRejection', (reason, promise) => {

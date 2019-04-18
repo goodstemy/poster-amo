@@ -1,4 +1,4 @@
 {
   "schedule": "0 */2 * * * *",
-  "birthdayCongratsTimeout": 20000
+  "birthdayCongratsTimeout": 43200000
 }

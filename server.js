@@ -1,10 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const Bot = require('node-telegram-bot-api');
 const poster = require('./poster');
 const amo = require('./amo');
 const cron = require('./cron');
 
 const app = express();
+const bot = new Bot(process.env.TG_BOT_TOKEN, { polling: true });
+
+bot.onText(/^\/echo$/, (msg, match) => {
+  console.log(msg);
+  bot.sendMessage(msg.chat.id, 'You said ' + match[1])
+});
 
 let tk = '';
 
@@ -54,12 +61,12 @@ app.get('/auth-poster', async (req, res) => {
 });
 
 app.get('/auth-amo', async (req, res) => {
-  await amo.auth().catch((err) => res.send(err));
+  await amo.auth().catch(res.send);
 
   console.log(`Amo authenticated successful`);
 
-  // amo.updateUsers(tk);
-  // amo.congratulate().catch((err) => console.error(err));
+  amo.updateUsers(tk);
+  amo.congratulate().catch(console.error);
 
   res.send('Authenticated!');
 
@@ -67,8 +74,33 @@ app.get('/auth-amo', async (req, res) => {
 });
 
 app.post('/client-payed', (req, res) => {
-  console.log(req.body);
-  res.send(200, '')
+  if (!req.body) {
+    res.send(500);
+    return console.log('Body are empty');
+  }
+
+  if (!tk) {
+    return res.sendStatus(200);
+  }
+
+  const {
+    object_id: objectId,
+    time,
+    data: {
+      value_relative: amount
+    }
+  } = req.body;
+
+  process.nextTick(() => {
+    amo.recordPurchase({
+      objectId,
+      time,
+      amount
+    })
+    .catch(console.error);
+  });
+
+  res.sendStatus(200)
 });
 
 app.listen(80, () => {
