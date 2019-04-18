@@ -66,7 +66,6 @@ app.get('/auth-amo', async (req, res) => {
   console.logToTg(`Amo authenticated successful`);
 
   amo.updateUsers(tk);
-  amo.congratulate().catch(console.error);
 
   res.send('Authenticated!');
 
