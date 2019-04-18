@@ -79,7 +79,7 @@ async function saveUsers(formData) {
 
       totalClients += formData.add.length;
 
-      console.log(`${totalClients} clients uploaded`);
+      console.logToTg(`${totalClients} clients uploaded`);
       resolve();
     });
   })
@@ -274,7 +274,7 @@ function sendCongrats(id) {
         return reject(err);
       }
 
-      console.log(`User with id ${id} congratulated!`);
+      console.logToTg(`User with id ${id} congratulated!`);
       resolve();
     });
   });
@@ -323,7 +323,7 @@ module.exports.updateUsers = async (accessToken) => {
 
   const newClients = clients.filter((el) => !cardNumberList.includes(el.client_id));
 
-  console.log(`New clients: ${newClients.length}`);
+  console.logToTg(`New clients: ${newClients.length}`);
 
   console.time('Uploading clients finished in');
   for (let i = 0; i < newClients.length; i += DEFAULT_CLIENTS_RANGE) {
@@ -351,7 +351,7 @@ module.exports.congratulate = async () => {
   const birthdaysList = contacts.filter(isBirthday);
 
   for (let i = 0; i < birthdaysList.length; i++) {
-    console.log('Todays birthday: ', birthdaysList[i].name);
+    console.logToTg('Todays birthday: ', birthdaysList[i].name);
     await sendCongrats(birthdaysList[i].id);
   }
 };
@@ -394,7 +394,7 @@ module.exports.recordPurchase = async (purchaseData = {}) => {
         return reject(err);
       }
 
-      console.log(`User with id ${amoUserId} make purchase with ${purchaseData.amount} amount!`);
+      console.logToTg(`User with id ${amoUserId} make purchase with ${purchaseData.amount} amount!`);
       resolve();
     });
   });
@@ -402,5 +402,5 @@ module.exports.recordPurchase = async (purchaseData = {}) => {
 
 // FIXME: using only for debugging. Remove on production
 process.on('unhandledRejection', (reason, promise) => {
-	console.log('Unhandled Rejection at:', reason.stack || reason)
+	console.logToTg('Unhandled Rejection at:', reason.stack || reason)
 });

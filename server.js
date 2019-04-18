@@ -7,11 +7,11 @@ const cron = require('./cron');
 
 const app = express();
 const bot = new Bot(process.env.TG_BOT_TOKEN, { polling: true });
+const TG_CHANNEL_ID = -1001460429000;
 
-bot.onText(/^\/echo$/, (msg, match) => {
-  console.log(msg);
-  bot.sendMessage(msg.chat.id, 'You said ' + match[1])
-});
+console.__proto__.logToTg = (msg) => {
+  bot.sendMessage(TG_CHANNEL_ID, msg);
+};
 
 let tk = '';
 
@@ -51,8 +51,8 @@ app.get('/auth-poster', async (req, res) => {
     return res.send(err);
   }
 
-  console.log(`Access token: ${beautifyAccessToken(tk)}`);
-  console.log(`To authenticate amo go to:\n${amo.amoAuthUri}\n`);
+  console.logToTg(`Access token: ${beautifyAccessToken(tk)}`);
+  console.logToTg(`To authenticate amo go to:\n${amo.amoAuthUri}\n`);
 
   res.send(`Access token: ${beautifyAccessToken(tk)}
     <br/>
@@ -63,7 +63,7 @@ app.get('/auth-poster', async (req, res) => {
 app.get('/auth-amo', async (req, res) => {
   await amo.auth().catch(res.send);
 
-  console.log(`Amo authenticated successful`);
+  console.logToTg(`Amo authenticated successful`);
 
   amo.updateUsers(tk);
   amo.congratulate().catch(console.error);
@@ -76,7 +76,7 @@ app.get('/auth-amo', async (req, res) => {
 app.post('/client-payed', (req, res) => {
   if (!req.body) {
     res.send(500);
-    return console.log('Body are empty');
+    return console.logToTg('Body are empty');
   }
 
   if (!tk) {

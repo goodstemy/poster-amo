@@ -30,7 +30,7 @@ module.exports.getToken = (code) => {
         reject(`Access token is not defined`);
       }
 
-      console.log(`Poster access token got successfuly`);
+      console.logToTg(`Poster access token got successfuly`);
 
       resolve(access_token);
     })
@@ -78,7 +78,7 @@ module.exports.getClients = (accessToken) => {
       });
 
       console.timeEnd('Clients got in');
-      console.log(`Total clients: ${clientsData.length}`);
+      console.logToTg(`Total clients: ${clientsData.length}`);
       resolve(clientsData);
     })
   });

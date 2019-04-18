@@ -9,7 +9,7 @@ module.exports.startCron = async (accessToken) => {
   }
 
   cron.schedule(cronConfig.schedule, () => {
-    console.log('Start updating users in amo...');
+    console.logToTg('Start updating users in amo...');
     amo.updateUsers(accessToken).catch((err) => console.error(err));
 
     setTimeout(() => {
