@@ -96,7 +96,7 @@ app.post('/client-payed', (req, res) => {
       time,
       amount
     })
-    .catch(console.error);
+    .catch(console.logToTg);
   });
 
   res.sendStatus(200)

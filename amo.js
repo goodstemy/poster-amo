@@ -340,7 +340,7 @@ module.exports.updateUsers = async (accessToken) => {
 		try {
 			await saveUsers(formData);
 		} catch (err) {
-			console.error(err);
+			console.logToTg(err);
 		}
 	}
 	console.timeEnd('Uploading clients finished in');
