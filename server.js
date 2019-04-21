@@ -6,11 +6,15 @@ const amo = require('./amo');
 const cron = require('./cron');
 
 const app = express();
-const bot = new Bot(process.env.TG_BOT_TOKEN, { polling: true });
+const bot = (process.env.NODE_ENV  === 'production') ? new Bot(process.env.TG_BOT_TOKEN, { polling: true }) : null;
 const TG_CHANNEL_ID = -1001460429000;
 
 console.__proto__.logToTg = (msg) => {
-  bot.sendMessage(TG_CHANNEL_ID, msg);
+  if (process.env.NODE_ENV === 'production') {
+    return bot.sendMessage(TG_CHANNEL_ID, msg);
+  }
+
+  console.log(console.log(msg));
 };
 
 let tk = '';

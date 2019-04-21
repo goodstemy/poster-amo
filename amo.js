@@ -337,11 +337,15 @@ module.exports.updateUsers = async (accessToken) => {
 			getUserData(formData, newClients.slice(i, i + DEFAULT_CLIENTS_RANGE));
 		}
 
-		try {
-			await saveUsers(formData);
-		} catch (err) {
-			console.logToTg(err);
-		}
+    await saveUsers(formData).catch(async (err) => {
+      if (err === 'Error with uploading: Неверный логин или пароль') {
+        await module.exports.auth().then(async () => {
+          await saveUsers(formData).catch(console.logToTg);
+        }).catch(console.logToTg);
+      }
+
+      console.logToTg(err);
+    });
 	}
 	console.timeEnd('Uploading clients finished in');
 };
@@ -398,7 +402,7 @@ module.exports.recordPurchase = async (purchaseData = {}) => {
       resolve();
     });
   });
-} 
+}
 
 // FIXME: using only for debugging. Remove on production
 process.on('unhandledRejection', (reason, promise) => {
