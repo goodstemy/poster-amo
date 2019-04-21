@@ -256,7 +256,7 @@ function sendCongrats(id) {
         contacts_id: [
           id
         ],
-        pipeline_id: 1753246
+        pipeline_id: 1753933
       }
     ]
   };
