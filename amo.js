@@ -351,7 +351,14 @@ module.exports.updateUsers = async (accessToken) => {
 };
 
 module.exports.congratulate = async () => {
-  const contacts = await getContacts();
+  let contacts = [];
+  contacts = await getContacts().catch(async (err) => {
+    if (err === 'Error with uploading: Неверный логин или пароль') {
+      await module.exports.auth().then(async () => {
+        contacts = await getContacts().catch(console.logToTg);
+      }).catch(console.logToTg);
+    }
+  });
   const birthdaysList = contacts.filter(isBirthday);
 
   for (let i = 0; i < birthdaysList.length; i++) {
