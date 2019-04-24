@@ -337,28 +337,16 @@ module.exports.updateUsers = async (accessToken) => {
 			getUserData(formData, newClients.slice(i, i + DEFAULT_CLIENTS_RANGE));
 		}
 
-    await saveUsers(formData).catch(async (err) => {
-      if (err === 'Error with uploading: Неверный логин или пароль') {
-        await module.exports.auth().then(async () => {
-          await saveUsers(formData).catch(console.logToTg);
-        }).catch(console.logToTg);
-      }
 
-      console.logToTg(err);
-    });
+    await module.exports.auth().catch(console.logToTg);
+    await saveUsers(formData).catch(console.logToTg);
 	}
 	console.timeEnd('Uploading clients finished in');
 };
 
 module.exports.congratulate = async () => {
-  let contacts = [];
-  contacts = await getContacts().catch(async (err) => {
-    if (err === 'Error with uploading: Неверный логин или пароль') {
-      await module.exports.auth().then(async () => {
-        contacts = await getContacts().catch(console.logToTg);
-      }).catch(console.logToTg);
-    }
-  });
+  await module.exports.auth().catch(console.logToTg);
+  const contacts = await getContacts().catch(console.logToTg);
   const birthdaysList = contacts.filter(isBirthday);
 
   for (let i = 0; i < birthdaysList.length; i++) {
