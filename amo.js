@@ -349,8 +349,8 @@ module.exports.congratulate = async () => {
   const contacts = await getContacts().catch(console.logToTg);
   const birthdaysList = contacts.filter(isBirthday);
 
+  console.logToTg('Today birthday ids:');
   for (let i = 0; i < birthdaysList.length; i++) {
-    console.logToTg('Todays birthday: ', birthdaysList[i].name);
     await sendCongrats(birthdaysList[i].id).catch(console.logToTg);
   }
 };
