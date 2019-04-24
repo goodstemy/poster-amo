@@ -351,7 +351,7 @@ module.exports.congratulate = async () => {
 
   for (let i = 0; i < birthdaysList.length; i++) {
     console.logToTg('Todays birthday: ', birthdaysList[i].name);
-    await sendCongrats(birthdaysList[i].id);
+    await sendCongrats(birthdaysList[i].id).catch(console.logToTg);
   }
 };
 

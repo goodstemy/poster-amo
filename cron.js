@@ -12,8 +12,8 @@ module.exports.startCron = async (accessToken) => {
     console.logToTg('Start updating users in amo...');
     amo.updateUsers(accessToken).catch(console.logToTg);
 
-    setTimeout(() => {
-      amo.congratulate().catch(console.logToTg);
+    setTimeout(async () => {
+      await amo.congratulate().catch(console.logToTg);
     }, cronConfig.birthdayCongratsTimeout);
   });
 };
