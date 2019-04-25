@@ -88,10 +88,9 @@ app.post('/client-payed', async (req, res) => {
   const {
     object_id: objectId,
     time,
-    data: {
-      value_relative: amount
-    }
   } = req.body;
+
+  const amount = JSON.parse(req.body.data).value_relative;
 
   await amo.auth().catch(res.send);
   await amo.recordPurchase({
