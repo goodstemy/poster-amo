@@ -55,28 +55,25 @@ app.get('/auth-poster', async (req, res) => {
     return res.send(err);
   }
 
-  console.logToTg(`Access token: ${beautifyAccessToken(tk)}`);
-  console.logToTg(`To authenticate amo go to:\n${amo.amoAuthUri}\n`);
-
-  res.send(`Access token: ${beautifyAccessToken(tk)}
-    <br/>
-    Authenticate amocrm by go to: <a href="http://${process.env.SERVER_URI}/auth-amo"> this link </a>
-  `);
-});
-
-app.get('/auth-amo', async (req, res) => {
   await amo.auth().catch(res.send);
-
-  console.logToTg(`Amo authenticated successful`);
-
-  amo.updateUsers(tk);
-
-  res.send('Authenticated!');
-
   cron.startCron(tk);
+
+  console.logToTg(`Access token: ${beautifyAccessToken(tk)}`);
+  res.send(`Access token: ${beautifyAccessToken(tk)}`);
 });
 
-app.post('/client-payed', (req, res) => {
+// app.get('/auth-amo', async (req, res) => {
+//   await amo.auth().catch(res.send);
+
+//   console.logToTg(`Amo authenticated successful`);
+
+//   amo.updateUsers(tk);
+
+//   res.send('Authenticated!');
+
+// });
+
+app.post('/client-payed', async (req, res) => {
   if (!req.body) {
     res.send(500);
     return console.logToTg('Body are empty');
@@ -94,14 +91,13 @@ app.post('/client-payed', (req, res) => {
     }
   } = req.body;
 
-  process.nextTick(() => {
-    amo.recordPurchase({
-      objectId,
-      time,
-      amount
-    })
-    .catch(console.logToTg);
-  });
+  await amo.auth().catch(res.send);
+  await amo.recordPurchase({
+    objectId,
+    time,
+    amount
+  })
+  .catch(console.logToTg);
 
   res.sendStatus(200)
 });
