@@ -83,6 +83,8 @@ app.post('/client-payed', async (req, res) => {
     return res.sendStatus(200);
   }
 
+  console.log(req.body);
+
   const {
     object_id: objectId,
     time,
@@ -105,7 +107,6 @@ app.post('/client-payed', async (req, res) => {
 
 app.listen(80, () => {
   console.log(`Listen on ${process.env.SERVER_URI}:80\n`);
-  const posterCodeUri = poster.buildGetTokenUri();
   console.log(`To start go to:\nhttp://${process.env.SERVER_URI}/\n`);
 });
 

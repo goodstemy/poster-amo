@@ -8,12 +8,13 @@ module.exports.startCron = async (accessToken) => {
     throw new Error('Cron config not found');
   }
 
-  cron.schedule(cronConfig.schedule, () => {
+  cron.schedule(cronConfig.schedule, async () => {
     console.logToTg('Start updating users in amo...');
     amo.updateUsers(accessToken).catch(console.logToTg);
+  });
 
-    setTimeout(async () => {
-      await amo.congratulate().catch(console.logToTg);
-    }, cronConfig.birthdayCongratsTimeout);
+  cron.schedule(cronConfig.birthdaySchedule, async () => {
+    console.logToTg('Start congrats users...');
+    await amo.congratulate().catch(console.logToTg);
   });
 };
