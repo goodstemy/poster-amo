@@ -108,3 +108,8 @@ app.listen(80, () => {
   console.log(`To start go to:\nhttp://${process.env.SERVER_URI}/\n`);
 });
 
+// FIXME: using only for debugging. Remove on production
+process.on('unhandledRejection', (reason, promise) => {
+  console.logToTg('Unhandled Rejection at:', reason.stack || reason)
+});
+

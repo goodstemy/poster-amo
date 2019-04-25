@@ -298,6 +298,7 @@ module.exports.auth = () => {
 };
 
 module.exports.updateUsers = async (accessToken) => {
+  await module.exports.auth().catch(console.logToTg);
   const clients = await poster.getClients(accessToken).catch((err) => {
   	throw new Error(err);
 	});
