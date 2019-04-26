@@ -42,7 +42,7 @@ async function getContacts() {
   const contacts = [];
 
   for (let i = 0;;i += 500) {
-    const r = await req(`${AMO_API_CONTACTS}?limit_rows=500&limit_offset=${i}`);
+    const r = await req(`${AMO_API_CONTACTS}?limit_rows=500&limit_offset=${i}`).catch(console.logToTg);
 
     if (!r.length) {
       break;
@@ -90,7 +90,7 @@ async function getUserIdByQuery(id = 0) {
     return 0;
   }
 
-  const res = await req(`${AMO_API_CONTACTS}?query=${id}`);
+  const res = await req(`${AMO_API_CONTACTS}?query=${id}`).catch(console.logToTg);
 
   for (let i = 0; i < res.length; i++) {
     const user = res[i];
