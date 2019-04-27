@@ -55,23 +55,11 @@ app.get('/auth-poster', async (req, res) => {
     return res.send(err);
   }
 
-  await amo.auth().catch(res.send);
   cron.startCron(tk);
 
   console.logToTg(`Access token: ${beautifyAccessToken(tk)}`);
   res.send(`Access token: ${beautifyAccessToken(tk)}`);
 });
-
-// app.get('/auth-amo', async (req, res) => {
-//   await amo.auth().catch(res.send);
-
-//   console.logToTg(`Amo authenticated successful`);
-
-//   amo.updateUsers(tk);
-
-//   res.send('Authenticated!');
-
-// });
 
 app.post('/client-payed', async (req, res) => {
   if (!req.body) {

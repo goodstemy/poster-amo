@@ -1,5 +1,4 @@
 {
   "schedule": "00 00 00 * * *",
-  "birthdaySchedule": "00 00 12 * * *",
-  "birthdayCongratsTimeout": 43200000
+  "birthdaySchedule": "00 00 12 * * *"
 }
