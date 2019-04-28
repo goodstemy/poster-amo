@@ -72,13 +72,21 @@ async function saveUsers(formData) {
         saveUsers(formData);
       }
 
-      const response = JSON.parse(body).response;
-      if (response) {
+      let response = null;
+      try {
+        response = JSON.parse(body).response;
+      } catch (e) {
+        console.logToTg('Got error while parse body:');
+        console.logToTg(e);
+        console.logToTg('Stack:');
+        console.logToTg(err);
+        console.logToTg(body);
+      }
+      if (!response) {
         return reject(`Error with uploading: ${response.error}`);
       }
 
       totalClients += formData.add.length;
-
       console.logToTg(`${totalClients} clients uploaded`);
       resolve();
     });
