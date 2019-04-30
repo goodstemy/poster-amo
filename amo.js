@@ -81,9 +81,14 @@ async function saveUsers(formData) {
         console.logToTg('Stack:');
         console.logToTg(err);
         console.logToTg(body);
+        console.logToTg(resp);
+        console.log('Stack:');
+        console.log(err);
+        console.log(body);
+        console.log(resp);
       }
       if (!response) {
-        return reject(`Error with uploading: ${resp.error}`);
+        return reject(`Error with uploading`);
       }
 
       totalClients += formData.add.length;
