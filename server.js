@@ -87,7 +87,6 @@ app.post('/client-payed', async (req, res) => {
     amount
   })
   .catch(console.logToTg);
-  console.logToTg(`Client with id ${objectId} close check with amount of ${amount}`);
 
   res.sendStatus(200)
 });
