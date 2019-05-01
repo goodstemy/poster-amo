@@ -88,6 +88,10 @@ async function saveUsers(formData) {
         console.log(resp);
       }
       if (!response) {
+        console.log('Stack:');
+        console.log(err);
+        console.log(body);
+        console.log(resp);
         return reject(`Error with uploading`);
       }
 
