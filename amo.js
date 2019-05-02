@@ -68,31 +68,11 @@ async function saveUsers(formData) {
         return reject(err);
       }
 
-      if (resp.statusCode === 504) {
-        saveUsers(formData);
-      }
-
-      let response = null;
-      try {
-        response = JSON.parse(body).response;
-      } catch (e) {
-        console.logToTg('Got error while parse body:');
-        console.logToTg(e);
-        console.logToTg('Stack:');
-        console.logToTg(err);
-        console.logToTg(body);
-        console.logToTg(resp);
-        console.log('Stack:');
-        console.log(err);
+      if (resp.statusCode !== 200) {
+        console.logToTg(`When uploading status code are: ${resp.statusCode}. Look at the console for more.`);
         console.log(body);
-        console.log(resp);
-      }
-      if (!response) {
-        console.log('Stack:');
-        console.log(err);
-        console.log(body);
-        console.log(resp);
-        return reject(`Error with uploading`);
+        console.log(resp.statusMessage);
+        console.log(resp.body);
       }
 
       totalClients += formData.add.length;

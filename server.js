@@ -14,7 +14,7 @@ console.__proto__.logToTg = (msg) => {
     return bot.sendMessage(TG_CHANNEL_ID, msg);
   }
 
-  console.log(console.log(msg));
+  console.log(msg);
 };
 
 let tk = '';
@@ -55,7 +55,7 @@ app.get('/auth-poster', async (req, res) => {
     return res.send(err);
   }
 
-  cron.startCron(tk);
+  cron.startCron(tk).catch(console.logToTg);
 
   console.logToTg(`Access token: ${beautifyAccessToken(tk)}`);
   res.send(`Access token: ${beautifyAccessToken(tk)}`);
