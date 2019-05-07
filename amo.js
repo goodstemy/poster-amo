@@ -239,8 +239,6 @@ function isBirthday(user) {
 }
 
 function sendCongrats(id) {
-  id = '37587333';
-
   if (!id) {
     return;
   }
@@ -249,7 +247,7 @@ function sendCongrats(id) {
     add: [
       {
         name: "День рождения",
-        sale: 1,
+        sale: 2,
         contacts_id: [
           id
         ],

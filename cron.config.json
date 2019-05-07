@@ -1,4 +1,4 @@
 {
-  "schedule": "00 00 00 * * *",
+  "schedule": "00 00 3 * * *",
   "birthdaySchedule": "00 00 12 * * *"
 }
